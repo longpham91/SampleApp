@@ -25,7 +25,7 @@ angular.module('Todo', [])
             }
 
             // Otherwise perform add
-            return $http.post('/api/v1/todos', this.toJson).then(function (response) {
+            return $http.post('/api/v1/todos', this.toJson()).then(function (response) {
                 return self.$$setId(response.data.id).$$massAssign(response.data);
             })
         };
