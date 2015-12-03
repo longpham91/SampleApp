@@ -8,7 +8,7 @@ var router  = express.Router();
 
 
 app.use(express.static(__dirname + '/static'));
-app.use(bodyParser.json({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(router);
 
