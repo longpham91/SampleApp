@@ -7,9 +7,9 @@
 </head>
 <body ng-app="Todo">
 <div class="container" ng-controller="todoCtrl">
-    Completed {{countCompleted()}}/{{todos.length}}
+    <h1>Completed {{countCompleted()}}/{{todos.length}}</h1>
     <ul class="list-unstyled">
-        <li ng-repeat="todo in todos"><input type="checkbox" ng-model="todo.complete" ng-change="todo.save()"> {{todo.text}} </li>
+        <li ng-repeat="todo in todos track by todo.id"><input type="checkbox" ng-model="todo.complete" ng-change="save(todo)"> {{todo.text}} </li>
     </ul>
 
     <input type="text" class="form-control" ng-model="newTodoText" placeholder="what's next?"/>

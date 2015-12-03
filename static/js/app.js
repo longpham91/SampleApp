@@ -1,5 +1,14 @@
 angular.module('Todo', [])
     .factory('Todo', function ($http) {
+
+        var todoListFactory = function (rawTodoListData) {
+            var todos = [];
+            angular.forEach(rawTodoListData, function (rawTodoData) {
+                todos.push(new Todo(rawTodoData).$$setId(rawTodoData.id))
+            });
+            return todos;
+        };
+
         var Todo = function (raw) {
             this.$$massAssign(raw);
         };
@@ -16,24 +25,23 @@ angular.module('Todo', [])
         };
 
         Todo.prototype.save = function () {
-            var self = this;
+
             // Have id, perform update
             if (this.id) {
                 return $http.put('/api/v1/todos/' + this.id, this.toJson()).then(function (response) {
-                    return self.$$massAssign(response.data);
+                    return todoListFactory(response.data);
                 });
             }
 
             // Otherwise perform add
             return $http.post('/api/v1/todos', this.toJson()).then(function (response) {
-                return self.$$setId(response.data.id).$$massAssign(response.data);
+                return todoListFactory(response.data);
             })
         };
 
         Todo.prototype.delete = function () {
-            var self = this;
             return $http.delete('/api/v1/todos/' + this.id).then(function (response) {
-                return self.$$massAssign(response.data);
+                return todoListFactory(response.data);
             });
         };
 
@@ -46,11 +54,7 @@ angular.module('Todo', [])
 
         Todo.all = function () {
             return $http.get('/api/v1/todos').then(function (response) {
-                var todos = [];
-                angular.forEach(response.data, function (rawTodoData) {
-                    todos.push(new Todo(rawTodoData).$$setId(rawTodoData.id))
-                });
-                return todos;
+                return todoListFactory(response.data);
             })
         };
 
@@ -68,9 +72,15 @@ angular.module('Todo', [])
         $scope.addNewTodo = function () {
             var todo = new Todo({text: $scope.newTodoText, complete: false});
 
-            todo.save().then(function (todo) {
-                $scope.todos.push(todo);
+            todo.save().then(function (todos) {
+                $scope.todos = todos;
                 $scope.newTodoText = '';
+            });
+        };
+
+        $scope.save = function (todo) {
+            todo.save().then(function () {
+                $scope.todos = todos;
             });
         };
 
