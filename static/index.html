@@ -7,12 +7,15 @@
 </head>
 <body ng-app="Todo">
 <div class="container" ng-controller="todoCtrl">
+    Completed {{countCompleted()/todos.length}}
     <ul class="list-unstyled">
-        <li ng-repeat="todo in todos"> {{todo.text}} </li>
+        <li ng-repeat="todo in todos"><input type="checkbox" ng-model="todo.complete" ng-change="todo.save()"> {{todo.text}} </li>
     </ul>
 
     <input type="text" class="form-control" ng-model="newTodoText" placeholder="what's next?"/>
     <button class="btn btn-primary" ng-click="addNewTodo()">Add</button>
+    <button class="btn btn-danger" ng-click="clearCompleted()">Clear Completed</button>
+
 </div>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="/js/app.js"></script>

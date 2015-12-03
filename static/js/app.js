@@ -66,15 +66,32 @@ angular.module('Todo', [])
         });
 
         $scope.addNewTodo = function () {
-            console.log('test');
             var todo = new Todo({text: $scope.newTodoText, complete: false});
 
             todo.save().then(function (todo) {
                 $scope.todos.push(todo);
                 $scope.newTodoText = '';
-            }).then(function () {
-                console.log('Something wrong @@');
-            })
+            });
+        };
+
+        $scope.countCompleted = function () {
+            var completed = 0;
+            angular.forEach($scope.todos, function (todo) {
+                if (todo.complete) {
+                    completed++;
+                }
+            });
+            return completed;
+        };
+
+        $scope.clearCompleted = function () {
+            angular.forEach($scope.todos, function (todo, index) {
+                if (todo.complete) {
+                    todo.delete().then(function () {
+                       $scope.todos.splice(index, 1)
+                    });
+                }
+            });
         }
     })
 ;
