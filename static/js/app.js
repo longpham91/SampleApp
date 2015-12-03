@@ -64,5 +64,14 @@ angular.module('Todo', [])
         Todo.all().then(function (todos) {
             $scope.todos = todos
         });
+
+        $scope.addNewTodo = function () {
+            var todo = new Todo({text: $scope.newTodoText, complete: false});
+
+            todo.save().then(function (todo) {
+                $scope.todos.push(todo);
+                $scope.newTodoText = '';
+            })
+        }
     })
 ;
