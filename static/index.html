@@ -6,15 +6,13 @@
     <title>Todo with AngularJS & NodeJS & PostgreSQL</title>
 </head>
 <body ng-app="Todo">
-<div class="container">
-    <div ng-controller="todoCtrl">
-        <ul class="list-unstyled">
-            <li ng-repeat="todo in todos"> {{todo.text}} </li>
-        </ul>
-    </div>
+<div class="container" ng-controller="todoCtrl">
+    <ul class="list-unstyled">
+        <li ng-repeat="todo in todos"> {{todo.text}} </li>
+    </ul>
 
     <input type="text" class="form-control" ng-model="newTodoText" placeholder="what's next?"/>
-    <button class="btn btn-primary" ng-click="addNewTodo">Add</button>
+    <button class="btn btn-primary" ng-click="addNewTodo()">Add</button>
 </div>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script src="/js/app.js"></script>
