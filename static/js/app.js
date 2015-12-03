@@ -72,6 +72,8 @@ angular.module('Todo', [])
             todo.save().then(function (todo) {
                 $scope.todos.push(todo);
                 $scope.newTodoText = '';
+            }).then(function () {
+                console.log('Something wrong @@');
             })
         }
     })
