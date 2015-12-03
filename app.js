@@ -6,7 +6,7 @@ var TodoCtroller = require('./routes/todo');
 var app = express();
 var router  = express.Router();
 
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded);
 app.use(router);
 
 router.post('/api/v1/todos', TodoCtroller.post);
