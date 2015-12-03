@@ -1,11 +1,12 @@
-var express = require('express');
-
-var TodoCtroller     = require('./routes/todo');
+var express      = require('express');
+var bodyParser   = require('body-parser');
+var TodoCtroller = require('./routes/todo');
 
 
 var app = express();
 var router  = express.Router();
 
+app.use(bodyParser.urlencoded());
 app.use(router);
 
 router.post('/api/v1/todos', TodoCtroller.post);
