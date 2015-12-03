@@ -1,4 +1,5 @@
 var path             = require('path');
+var pg               = require('pg');
 var connectionString = require('./../config/connection-string');
 
 exports.post = function(req, res) {
