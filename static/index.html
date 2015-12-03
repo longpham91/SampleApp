@@ -7,7 +7,7 @@
 </head>
 <body ng-app="Todo">
 <div class="container" ng-controller="todoCtrl">
-    Completed {{countCompleted()/todos.length}}
+    Completed {{countCompleted()}}/{{todos.length}}
     <ul class="list-unstyled">
         <li ng-repeat="todo in todos"><input type="checkbox" ng-model="todo.complete" ng-change="todo.save()"> {{todo.text}} </li>
     </ul>
