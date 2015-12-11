@@ -1,15 +1,21 @@
 var express      = require('express');
+var app          = express();
+var router       = express.Router();
 var bodyParser   = require('body-parser');
 var TodoCtroller = require('./routes/todo');
 
+/**
+ * Services
+ *
+ * @type {*|exports|module.exports}
+ */
+app.use(require('./tedious-service-provider'));
 
-var app = express();
-var router  = express.Router();
-
-
+/**
+ * Routing & middlewares
+ */
 app.use(express.static(__dirname + '/static'));
 app.use(bodyParser.json({ extended: true }));
-
 app.use(router);
 
 router.post('/api/v1/todos', TodoCtroller.post);
