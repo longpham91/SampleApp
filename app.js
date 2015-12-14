@@ -31,7 +31,7 @@ app.use(function (request, response) {
 });
 
 app.use(function (error, request, response, next) {
-    response.status(404).json({
+    response.status(500).json({
         message: error.message,
         code: error.code
     });

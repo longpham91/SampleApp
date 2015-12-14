@@ -52,7 +52,7 @@ exports.get = function(req, res) {
     query.on('done', function() {
         return res.json(results);
     });
-    req.app.get('db').execSql(sqlRequest);
+    req.app.get('db').execSql(query);
 };
 
 exports.put = function(req, res) {
