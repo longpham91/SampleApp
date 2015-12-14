@@ -2,14 +2,14 @@ exports.post = function(request, response) {
 
 };
 
-exports.get = function(req, res) {
+exports.get = function(request, response) {
+    response.json({foo: 'bar'});
+};
+
+exports.put = function(request, response) {
 
 };
 
-exports.put = function(req, res) {
-
-};
-
-exports.delete = function(req, res) {
+exports.delete = function(request, response) {
 
 };
