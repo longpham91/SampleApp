@@ -25,24 +25,22 @@ angular.module('Todo', [])
         };
 
         Todo.prototype.save = function () {
-
+            var self = this;
             // Have id, perform update
             if (this.id) {
                 return $http.put('/api/v1/todos/' + this.id, this.toJson()).then(function (response) {
-                    return todoListFactory(response.data);
+                    return self.$$massAssign(response.data);
                 });
             }
 
             // Otherwise perform add
             return $http.post('/api/v1/todos', this.toJson()).then(function (response) {
-                return todoListFactory(response.data);
+                return new Todo(response.data).$$setId(response.data.id);
             })
         };
 
         Todo.prototype.delete = function () {
-            return $http.delete('/api/v1/todos/' + this.id).then(function (response) {
-                return todoListFactory(response.data);
-            });
+            return $http.delete('/api/v1/todos/' + this.id);
         };
 
         Todo.prototype.toJson = function () {
@@ -72,16 +70,14 @@ angular.module('Todo', [])
         $scope.addNewTodo = function () {
             var todo = new Todo({text: $scope.newTodoText, complete: false});
 
-            todo.save().then(function (todos) {
-                $scope.todos = todos;
+            todo.save().then(function (todo) {
+                $scope.todos.push(todo);
                 $scope.newTodoText = '';
             });
         };
 
         $scope.save = function (todo) {
-            todo.save().then(function () {
-                $scope.todos = todos;
-            });
+            todo.save();
         };
 
         $scope.countCompleted = function () {

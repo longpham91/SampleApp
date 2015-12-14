@@ -1,129 +1,75 @@
 var tedious = require('tedious');
 
-exports.post = function(req, res) {
-
-    var results = [];
-
-    // Grab data from http request
-    var data = {text: req.body.text, complete: false};
-
-
-
-    // Get a Postgres client from the connection pool
-    pg.connect(connectionString, function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-            done();
-            console.log(err);
-            return res.status(500).json({ success: false, data: err});
+exports.post = function (req, res) {
+    var request = new tedious.Request("INSERT INTO dbo.items(text, complete) VALUES (@text, @complete)", function (err) {
+        if (err) {
+            return res.status(500).json({success: false, data: err});
         }
-
-        // SQL Query > Insert Data
-        client.query("INSERT INTO items(text, complete) values($1, $2)", [data.text, data.complete]);
-
-        // SQL Query > Select Data
-        var query = client.query("SELECT * FROM items ORDER BY id ASC");
-
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            done();
-            return res.json(results);
-        });
-
-
     });
+    request.addParameter('text', tedious.TYPES.NVarChar, req.body.text);
+    request.addParameter('complete', tedious.TYPES.Bit, false);
+
+    request.on('doneInProc', function () {
+        res.json({text: req.body.text, complete: false});
+    });
+
+    req.app.get('db').execSql(request);
 };
 
-exports.get = function(req, res) {
+// MSSQL
+exports.get = function (req, res) {
+
     var query = new tedious.Request("SELECT * FROM items ORDER BY id ASC", function (error) {
         if (error) {
-            return res.status(500).json({ success: false, data: err});
+            return res.status(500).json({success: false, data: err});
         }
     });
+    var listTodo = [];
+    query.on('row', function(columns) {
+        listTodo.push({
+            id: columns.id.value,
+            text: columns.text.value,
+            complete: columns.complete.value
+        });
+    });
 
-    query.on('done', function(rowCount, more, rows) {
-        res.json(rows);
+    query.on('doneInProc', function () {
+       res.json(listTodo);
     });
     req.app.get('db').execSql(query);
 };
 
-exports.put = function(req, res) {
+// todo migrates to mssql
+exports.put = function (req, res) {
 
-    var results = [];
-
-    // Grab data from the URL parameters
-    var id = req.params.todo_id;
-
-    // Grab data from http request
-    var data = {text: req.body.text, complete: req.body.complete};
-
-    // Get a Postgres client from the connection pool
-    pg.connect(connectionString, function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-            done();
-            console.log(err);
-            return res.status(500).send(json({ success: false, data: err}));
+    var request = new tedious.Request("UPDATE items SET text=@text, complete=@complete WHERE id=@id", function (err) {
+        if (err) {
+            return res.status(500).json({success: false, data: err});
         }
-
-        // SQL Query > Update Data
-        client.query("UPDATE items SET text=($1), complete=($2) WHERE id=($3)", [data.text, data.complete, id]);
-
-        // SQL Query > Select Data
-        var query = client.query("SELECT * FROM items ORDER BY id ASC");
-
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            done();
-            return res.json(results);
-        });
     });
+    request.addParameter('id', tedious.TYPES.Int, req.params.todo_id);
+    request.addParameter('text', tedious.TYPES.NVarChar, req.body.text);
+    request.addParameter('complete', tedious.TYPES.Bit, req.body.complete);
+    request.on('doneInProc', function () {
+        res.json(req.body);
+    });
+
+    req.app.get('db').execSql(request);
 
 };
 
-exports.delete = function(req, res) {
+// todo migrates to mssql
+exports.delete = function (req, res) {
 
-    var results = [];
-
-    // Grab data from the URL parameters
-    var id = req.params.todo_id;
-
-
-    // Get a Postgres client from the connection pool
-    pg.connect(connectionString, function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-            done();
-            console.log(err);
-            return res.status(500).json({ success: false, data: err});
+    var deleteQuery = new tedious.Request('DELETE FROM items where id=(@itemId)', function (error) {
+        if (error) {
+            return res.status(500).json({success: false, data: err});
         }
-
-        // SQL Query > Delete Data
-        client.query("DELETE FROM items WHERE id=($1)", [id]);
-
-        // SQL Query > Select Data
-        var query = client.query("SELECT * FROM items ORDER BY id ASC");
-
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            done();
-            return res.json(results);
-        });
     });
+    deleteQuery.addParameter('itemId', tedious.TYPES.Int, req.params.todo_id);
 
+    req.app.get('db').execSql(deleteQuery);
+    deleteQuery.on('doneInProc', function () {
+        res.json({status: 'ok'});
+    })
 };

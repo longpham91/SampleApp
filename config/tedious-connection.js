@@ -4,5 +4,5 @@ module.exports = {
     server: 'jarvis.database.windows.net',
 
     // Azure additional option
-    options: {encrypt: true, database: 'jarvis'}
+    options: {encrypt: true, database: 'jarvis', rowCollectionOnDone: true, useColumnNames: true}
 };
