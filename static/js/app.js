@@ -60,24 +60,34 @@ angular.module('Todo', [])
     })
 
     .controller('todoCtrl', function ($scope, Todo) {
-
+        $scope.processing = true;
         $scope.todos = [];
 
         Todo.all().then(function (todos) {
             $scope.todos = todos
-        });
+        }).finally(function () {
+            $scope.processing = false;
+        })
+        ;
 
         $scope.addNewTodo = function () {
+            $scope.processing = true;
             var todo = new Todo({text: $scope.newTodoText, complete: false});
 
             todo.save().then(function (todo) {
                 $scope.todos.push(todo);
                 $scope.newTodoText = '';
-            });
+            }).finally(function () {
+                $scope.processing = false;
+            })
+            ;
         };
 
         $scope.save = function (todo) {
-            todo.save();
+            $scope.processing = true;
+            todo.save().finally(function () {
+                $scope.processing = false;
+            });
         };
 
         $scope.countCompleted = function () {

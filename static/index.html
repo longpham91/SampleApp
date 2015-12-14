@@ -2,19 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
     <title>Todo with AngularJS & NodeJS & PostgreSQL</title>
+    <style>[ng-cloak] {display: none}</style>
 </head>
 <body ng-app="Todo">
 <div class="container" ng-controller="todoCtrl">
-    <h1>Completed {{countCompleted()}}/{{todos.length}}</h1>
-    <ul class="list-unstyled">
+    <h1>Completed <span ng-cloak>{{countCompleted()}}/{{todos.length}}</span></h1>
+
+    <ul class="list-unstyled" ng-cloak="" ng-if="!processing">
         <li ng-repeat="todo in todos track by todo.id"><input type="checkbox" ng-model="todo.complete" ng-change="save(todo)"> {{todo.text}} </li>
     </ul>
 
     <input type="text" class="form-control" ng-model="newTodoText" placeholder="what's next?"/>
-    <button class="btn btn-primary" ng-click="addNewTodo()">Add</button>
-    <button class="btn btn-danger" ng-click="clearCompleted()">Clear Completed</button>
+    <hr/>
+    <div class="btn-group pull-right">
+        <button class="btn btn-primary" ng-click="addNewTodo()" ng-disabled="processing">Add</button>
+        <button class="btn btn-danger" ng-click="clearCompleted()" ng-disabled="processing">Clear Completed</button>
+    </div>
 
 </div>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
