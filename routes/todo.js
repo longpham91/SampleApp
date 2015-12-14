@@ -47,12 +47,11 @@ exports.get = function(req, res) {
         }
     });
     query.on('row', function(row) {
-        console.dir(row);
         results.push(row);
     });
     query.on('done', function() {
         console.dir(results);
-        return res.json(results);
+        res.json(results);
     });
     req.app.get('db').execSql(query);
 };
