@@ -21,7 +21,7 @@ exports.get = function (req, res) {
 
     var query = new tedious.Request("SELECT * FROM items ORDER BY id ASC", function (error) {
         if (error) {
-            return res.status(500).json({success: false, data: err});
+            return res.status(500).json({success: false, data: error});
         }
     });
     var listTodo = [];
@@ -63,7 +63,7 @@ exports.delete = function (req, res) {
 
     var deleteQuery = new tedious.Request('DELETE FROM items where id=(@itemId)', function (error) {
         if (error) {
-            return res.status(500).json({success: false, data: err});
+            return res.status(500).json({success: false, data: error});
         }
     });
     deleteQuery.addParameter('itemId', tedious.TYPES.Int, req.params.todo_id);
