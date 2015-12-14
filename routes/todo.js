@@ -40,18 +40,14 @@ exports.post = function(req, res) {
 };
 
 exports.get = function(req, res) {
-    var results = [];
     var query = new tedious.Request("SELECT * FROM items ORDER BY id ASC", function (error) {
         if (error) {
             return res.status(500).json({ success: false, data: err});
         }
     });
-    query.on('row', function(row) {
-        results.push(row);
-    });
-    query.on('done', function() {
-        console.dir(results);
-        res.json(results);
+
+    query.on('done', function(rowCount, more, rows) {
+        res.json(rows);
     });
     req.app.get('db').execSql(query);
 };
