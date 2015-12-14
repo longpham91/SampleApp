@@ -50,7 +50,6 @@ exports.get = function(req, res) {
         results.push(row);
     });
     query.on('done', function() {
-        done();
         return res.json(results);
     });
     req.app.get('db').execSql(sqlRequest);
