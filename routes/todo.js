@@ -97,10 +97,7 @@ exports.test1 = function (req, res) {
     query.addOutputParameter('Return', TYPES.VarChar);
     
     query.on('returnValue', function(parameterName, value, metadata) {
-        res.json({result: value});      // number = 42                                               // string = qaz
-    });
-    query.on('doneInProc', function (result) {
-        //res.json(item);
+        res.json({result: value});
     });
     req.app.get('db').callProcedure(query);   
 }
@@ -135,7 +132,6 @@ var repeatingRequest = function(req, res) {
             res.json(item);
         }
     });
-    
     req.app.get('db').callProcedure(query2);
 }
 
@@ -147,14 +143,11 @@ exports.test2 = function (req, res) {
             repeatingRequest(req, res);
         }
     });
-    
     query.on('row', function(columns) {
         childrenList.push({
             text: columns.OrdText.value,
         });
     });
-    
     query.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
-    
     req.app.get('db').callProcedure(query);
 }
