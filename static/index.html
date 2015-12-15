@@ -10,7 +10,7 @@
 <div class="container" ng-controller="todoCtrl">
     <h1>Completed <span ng-cloak>{{countCompleted()}}/{{todos.length}}</span></h1>
 
-    <ul class="list-unstyled" ng-cloak="" ng-if="!processing">
+    <ul class="list-unstyled" ng-cloak>
         <li ng-repeat="todo in todos track by todo.id"><input type="checkbox" ng-model="todo.complete" ng-change="save(todo)"> {{todo.text}} </li>
     </ul>
 
