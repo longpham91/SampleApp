@@ -22,6 +22,9 @@ router.post('/api/v1/todos', TodoCtroller.post);
 router.get('/api/v1/todos', TodoCtroller.get);
 router.put('/api/v1/todos/:todo_id', TodoCtroller.put);
 router.delete('/api/v1/todos/:todo_id', TodoCtroller.delete);
+router.get('/api/v1/todos_test', TodoCtroller.test1);
+router.get('/api/v1/todos_test/:todo_id', TodoCtroller.test2);
+router.get('/api/v1/todos_test/children/:todo_id', TodoCtroller.test2);
 
 app.use(function (request, response) {
     response.status(404).json({
