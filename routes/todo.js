@@ -94,44 +94,56 @@ exports.test1 = function (req, res) {
     });
     
     query.addParameter('TestParam', TYPES.Int, 0);
-    query.addParameter('Return', TYPES.VarChar, 'none');
+    query.addOutputParameter('Return', TYPES.VarChar);
     
+    query.on('returnValue', function(parameterName, value, metadata) {
+        res.json({result: value});      // number = 42                                               // string = qaz
+    });
     query.on('doneInProc', function (result) {
-        res.json({result: result});
+        //res.json(item);
     });
     req.app.get('db').callProcedure(query);   
 }
 
 // test with retrieving Item by ID
 exports.test2 = function (req, res) {
-    var query = new tedious.Request('usp_Items_ByItemID', function(error) {
+    var query = new tedious.Request('usp_ItemsOrders_ByItemID', function(error) {
         if (error) {
             return res.status(500).json({success: false, data: error});
+        } else {
+            var query2 = new tedious.Request('usp_Items_ByItemID', function(error) {
+                if (error) {
+                    return res.status(500).json({success: false, data: error});
+                }
+            });
+            query2.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
+            
+            var item = [];
+            query2.on('row', function(columns) {
+                item.push({
+                    id: columns.id.value,
+                    text: columns.text.value,
+                    complete: columns.complete.value,
+                    children: childrenList
+                });
+            });
+            query2.on('doneInProc', function (result) {
+                res.json(item);
+            });
+            
+            req.app.get('db').callProcedure(query2);
         }
+    });
+    var childrenList = [];
+    query.on('row', function(columns) {
+        childrenList.push({
+            text: columns.OrdText.value,
+        });
     });
     
     query.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
     query.on('doneInProc', function (result) {
-        if (result) {
-            res.json({text: result.text.value, complete: result.complete.value, id: result.id.value});
-        } else {
-            res.json(req.body);
-        }
-    });
-    req.app.get('db').callProcedure(query);
-}
-
-// test with retrieving ChildItems by ID
-exports.test3 = function (req, res) {
-    var query = new tedious.Request('usp_ItemsOrders_ByItemID', function(error) {
-        if (error) {
-            return res.status(500).json({success: false, data: error});
-        }
-    });
-    
-    query.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
-    query.on('doneInProc', function () {
-        res.json(req.body);
+        res.json({result: result});
     });
     req.app.get('db').callProcedure(query);
 }
