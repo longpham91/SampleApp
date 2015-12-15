@@ -1,7 +1,7 @@
 var tedious = require('tedious');
 
 exports.post = function (req, res) {
-    var request = new tedious.Request("INSERT INTO dbo.items(text, complete) VALUES (@text, @complete)", function (err) {
+    var request = new tedious.Request("INSERT INTO dbo.items(text, complete) VALUES (@text, @complete);select @@identity;", function (err) {
         if (err) {
             return res.status(500).json({success: false, data: err});
         }
@@ -9,8 +9,8 @@ exports.post = function (req, res) {
     request.addParameter('text', tedious.TYPES.NVarChar, req.body.text);
     request.addParameter('complete', tedious.TYPES.Bit, false);
 
-    request.on('doneInProc', function () {
-        res.json({text: req.body.text, complete: false});
+    request.on('row', function (row) {
+        res.json({text: req.body.text, complete: false, id: row[''].value});
     });
 
     req.app.get('db').execSql(request);
