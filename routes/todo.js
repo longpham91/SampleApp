@@ -106,35 +106,48 @@ exports.test1 = function (req, res) {
 }
 
 // test with retrieving Item by ID
+var childrenList = [];
+var cnt = 0;
+var repeatingRequest = function(req, res) {
+    var query2 = new tedious.Request('usp_Items_ByItemID', function(error) {
+        if (error) {
+            return res.status(500).json({success: false, data: error});
+        } else {
+            if (cnt < 20) {
+                repeatingRequest(req, res);
+                cnt+=1;
+            }
+        }
+    });
+    query2.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
+    
+    var item = [];
+    query2.on('row', function(columns) {
+        item.push({
+            id: columns.id.value,
+            text: columns.text.value,
+            complete: columns.complete.value,
+            children: childrenList
+        });
+    });
+    query2.on('doneInProc', function (result) {
+        if (cnt === 20) {
+            res.json(item);
+        }
+    });
+    
+    req.app.get('db').callProcedure(query2);
+}
+
 exports.test2 = function (req, res) {
     var query = new tedious.Request('usp_ItemsOrders_ByItemID', function(error) {
         if (error) {
             return res.status(500).json({success: false, data: error});
         } else {
-            var query2 = new tedious.Request('usp_Items_ByItemID', function(error) {
-                if (error) {
-                    return res.status(500).json({success: false, data: error});
-                }
-            });
-            query2.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
-            
-            var item = [];
-            query2.on('row', function(columns) {
-                item.push({
-                    id: columns.id.value,
-                    text: columns.text.value,
-                    complete: columns.complete.value,
-                    children: childrenList
-                });
-            });
-            query2.on('doneInProc', function (result) {
-                res.json(item);
-            });
-            
-            req.app.get('db').callProcedure(query2);
+            repeatingRequest(req, res);
         }
     });
-    var childrenList = [];
+    
     query.on('row', function(columns) {
         childrenList.push({
             text: columns.OrdText.value,
@@ -142,8 +155,6 @@ exports.test2 = function (req, res) {
     });
     
     query.addParameter('ItemsID', TYPES.Int, req.params.todo_id);
-    query.on('doneInProc', function (result) {
-        res.json({result: result});
-    });
+    
     req.app.get('db').callProcedure(query);
 }
